@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -8,57 +9,34 @@ class TaskController extends Controller
 {
     public function index(Request $request)
     {
-        return response()->json([
-            'status' => 'success',
-            'data' => $request->user()->tasks
-        ]);
+        return $request->user()
+                       ->tasks()
+                       ->orderBy('created_at', 'desc')
+                       ->get();
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'note' => 'nullable|string',
-            'status' => 'boolean'
+        $request->validate(['title' => 'required|string|max:255']);
+        $task = $request->user()->tasks()->create([
+            'title'     => $request->title,
+            'completed' => false,
         ]);
-
-        $task = $request->user()->tasks()->create($validated);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Task created',
-            'data' => $task
-        ], 201);
+        return response()->json($task, 201);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Task $task)
     {
-        $task = $request->user()->tasks()->findOrFail($id);
-
-        $validated = $request->validate([
-            'title' => 'sometimes|string|max:255',
-            'note' => 'sometimes|string|nullable',
-            'status' => 'sometimes|boolean'
-        ]);
-
-        $task->update($validated);
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Task updated',
-            'data' => $task
-        ]);
+        $request->validate(['completed' => 'required|boolean']);
+        // Optional: $this->authorize('update', $task);
+        $task->update(['completed' => $request->completed]);
+        return response()->json($task);
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(Task $task)
     {
-        $task = $request->user()->tasks()->findOrFail($id);
+        // Optional: $this->authorize('delete', $task);
         $task->delete();
-
-        return response()->json([
-            'status' => 'success',
-            'message' => 'Task deleted'
-        ]);
+        return response()->json(null, 204);
     }
 }
-
