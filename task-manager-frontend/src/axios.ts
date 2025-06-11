@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // Create axios instance
-const api = axios.create({
+export const api = axios.create({
   baseURL: 'http://localhost:8000/api',
   headers: {
     'Content-Type': 'application/json',
@@ -11,7 +11,7 @@ const api = axios.create({
 
 // Attach token on each request if present
 api.interceptors.request.use((config) => {
-  const token = localStorage.getItem('authToken');
+  const token = localStorage.getItem('token');
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
@@ -20,8 +20,7 @@ api.interceptors.request.use((config) => {
 
 // Token helpers
 export const saveToken = (token: string) => {
-  localStorage.setItem('authToken', token);
-};
+localStorage.setItem('token', response.data.access_token);};
 
 export const removeToken = () => {
   localStorage.removeItem('authToken');
@@ -33,6 +32,7 @@ export const isAuthenticated = () => !!localStorage.getItem('authToken');
 export const registerUser = async (data: { name: string; email: string; password: string }) => {
   const response = await api.post('/register', data);
   const token = response.data.access_token;
+console.log('Token:', token);
   saveToken(token);
   return response;
 };
