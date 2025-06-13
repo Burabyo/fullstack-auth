@@ -26,10 +26,6 @@ A full-stack task management app built with **Laravel** (backend API) and **Reac
 ## Installation & Setup
 
 ### Backend
-
-1. Clone the repo:
-
-   ```bash
-   git clone https://github.com/your-username/your-repo.git
-   cd your-repo/backend
+Done by 
+Jolly Gift
 
